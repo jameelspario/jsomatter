@@ -4,8 +4,11 @@ import 'package:get/get.dart';
 import '../../domain/tab_model.dart';
 import '../../utils/utils.dart';
 import '../widgets/show_toast_dialog.dart';
+import 'logger_controller.dart';
 
 class HomePageController extends GetxController {
+  final LoggerController logger = Get.find();
+
   int count = 0;
  final _selected = TabModel().obs;
   RxList<TabModel> tabsIndex = <TabModel>[].obs;
@@ -17,6 +20,7 @@ class HomePageController extends GetxController {
 
   final utils = Utils();
   final TextEditingController txtController = TextEditingController();
+
   // final JsonTextFieldController controller = JsonTextFieldController();
 
   var txtSize = 16.0.obs;
@@ -73,6 +77,44 @@ class HomePageController extends GetxController {
   void onInit() {
     super.onInit();
     onAdd();
+    txtController.addListener(_onTextChanged);
+
+  }
+
+  int lineNumber = 1;
+  var columnNumber = 1.obs;
+
+  _onTextChanged(){
+    final text = txtController.text;
+    final cursorPosition = txtController.selection.baseOffset;
+
+    if (cursorPosition == -1) {
+      return; // No cursor
+    }
+
+    // Split the text into lines
+    final lines = text.split('\n');
+
+    // Determine the line number
+    int line = 0;
+    int charsCount = 0;
+
+    for (int i = 0; i < lines.length; i++) {
+      final lineLength = lines[i].length;
+
+      if (cursorPosition <= charsCount + lineLength) {
+        line = i + 1;
+        break;
+      }
+
+      charsCount += lineLength + 1; // Adding 1 for the newline character
+    }
+
+    // Determine the column number
+    final column = cursorPosition - charsCount + 1;
+
+      lineNumber = line;
+      columnNumber.value = column;
   }
 
 
@@ -112,14 +154,18 @@ class HomePageController extends GetxController {
     //   ShowToastDialog.showToast("Invalid JSON");
     //   return;
     // }
+    if(str.isEmpty){
+      return;
+    }
 
     try {
       final pretty = Utils.prettify(str);
       txtController.text = pretty;
     }catch(e){
-      print(e);
+      print("-- $e");
       final json = Utils.jsonifyString(str);
       if(!Utils.isValidJSON(json)){
+        logger.logger("$e".replaceAll("FormatException: SyntaxError:", ""));
         ShowToastDialog.showToast("Invalid JSON");
         return;
       }
@@ -133,6 +179,6 @@ class HomePageController extends GetxController {
     // final json = Utils.jsonifyString(str);
     String compactJson = Utils.compactJson(str);
     txtController.text = compactJson;
-
   }
+
 }
