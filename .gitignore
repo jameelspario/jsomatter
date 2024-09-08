@@ -16,11 +16,7 @@ migrate_working_dir/
 *.iws
 .idea/
 .vscode/
-/android/
-/ios/
-/windows/
-/ios/
-/macos/
+
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
@@ -36,7 +32,12 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-
+/android/
+/ios/
+/windows/
+/ios/
+/macos/
+/linux/
 # Symbolication related
 app.*.symbols
 
