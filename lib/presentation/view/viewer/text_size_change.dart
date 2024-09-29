@@ -1,14 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:webjason/utils/extensions.dart';
 
+import '../../../utils/extensions.dart';
 import '../../controllers/home_page_controller.dart';
 import '../../widgets/widgets.dart';
 
 class TextSizeChange extends StatefulWidget {
-  const TextSizeChange({ this.callback, super.key});
+  const TextSizeChange({this.callback, super.key});
+
   final Function(double size)? callback;
 
   @override
@@ -20,7 +22,7 @@ class _TextSizeChangeState extends State<TextSizeChange> {
 
   bool ishoveringAdd = false;
   bool ishoveringRemove = false;
-  Timer? _timer; 
+  Timer? _timer;
 
   void _incrementCounter() {
     setState(() {
@@ -31,9 +33,10 @@ class _TextSizeChangeState extends State<TextSizeChange> {
 
   // Function to decrease the counter
   void _decrementCounter() {
-    final val =  homeController.txtSize.value;
+    final val = homeController.txtSize.value;
     setState(() {
-      if (val > 0) homeController.txtSize.value--; // Optional: prevent negative numbers
+      if (val > 0)
+        homeController.txtSize.value--; // Optional: prevent negative numbers
     });
     // widget.callback?.call(thisSize);
   }
@@ -62,7 +65,7 @@ class _TextSizeChangeState extends State<TextSizeChange> {
 
   @override
   void dispose() {
-    _stop();  // Clean up the timer when the widget is disposed
+    _stop(); // Clean up the timer when the widget is disposed
     super.dispose();
   }
 
@@ -72,26 +75,48 @@ class _TextSizeChangeState extends State<TextSizeChange> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        HoverIcon(
-          icon: Icons.add,
-          onStart: ()=>_startIncrement(), 
-          onStop: ()=>_stop(),
-          onTap: ()=> _incrementCounter(),
+
+        CircleAvatar(
+          backgroundColor: Colors.transparent,
+          radius: 14,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            splashRadius: 4,
+            icon: SvgPicture.asset("assets/svg/text_increase.svg",
+                width: 18,
+                colorFilter: const ColorFilter.mode(
+                  Colors.grey,
+                  BlendMode.srcIn,
+                )),
+            onPressed: _incrementCounter,
+          ),
         ),
-        4.0.spaceX, 
-        Obx(()=> Text("${ homeController.txtSize.value}")),
-        4.0.spaceX,
-        HoverIcon(
-          icon: Icons.remove,
-          onStart: ()=>_startDecrement(),
-          onStop: ()=>_stop(),
-          onTap: ()=> _decrementCounter(), 
+        Obx(
+          () => Text(
+            "${homeController.txtSize.value}",
+            style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
+          ),
         ),
+        CircleAvatar(
+          backgroundColor: Colors.transparent,
+          radius: 14,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            splashRadius: 4,
+            icon: SvgPicture.asset("assets/svg/text_decrease.svg",
+                width: 18,
+                colorFilter: const ColorFilter.mode(
+                  Colors.grey,
+                  BlendMode.srcIn,
+                )),
+            onPressed: _decrementCounter,
+          ),
+        )
+
       ],
     );
   }

@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 
 class MyWidget extends StatelessWidget {
-  const MyWidget({this.controller, this.txtSize = 16.0 ,super.key});
+  const MyWidget(
+      {this.controller,
+      this.txtSize = 16.0,
+      this.isBold,
+      this.isItalic,
+      super.key});
+
   final TextEditingController? controller;
   final double txtSize;
+  final dynamic isBold;
+  final dynamic isItalic;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +24,11 @@ class MyWidget extends StatelessWidget {
             expands: true,
             maxLines: null,
             textAlign: TextAlign.start,
-            style: TextStyle(fontSize: txtSize),
+            style: TextStyle(
+              fontSize: txtSize,
+              fontWeight: isBold == 1 ? FontWeight.bold : FontWeight.normal,
+              fontStyle: isItalic == 1 ? FontStyle.italic : FontStyle.normal,
+            ),
             decoration: InputDecoration(
               isDense: true,
               contentPadding: const EdgeInsets.all(8),

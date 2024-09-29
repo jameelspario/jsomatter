@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:webjason/utils/extensions.dart';
 // import 'package:json_text_field/json_text_field.dart';
 
+import '../../../utils/extensions.dart';
 import '../../controllers/home_page_controller.dart';
 import '../../widgets/my_container.dart';
 import 'my_form_feild.dart';
@@ -24,6 +24,10 @@ class ViewerPage extends StatelessWidget {
             OptionMenu(
               callback: homeController.onOptionMenu,
               onSizeChange: homeController.onSizeChange,
+              isBold: homeController.isBold,
+              isItalic: homeController.isItalic,
+              onBold: homeController.onBold,
+              onItalic: homeController.onItalic,
             ),
             // HorizontalDraggableList(),
             // HorizontalConstrainedDraggableList(),
@@ -40,6 +44,8 @@ class ViewerPage extends StatelessWidget {
                       child: Obx(() => MyWidget(
                             controller: homeController.txtController,
                             txtSize: homeController.txtSize.value,
+                            isBold: homeController.isBold.value,
+                            isItalic: homeController.isItalic.value,
                           )));
                   // return Column(
                   //   children: [

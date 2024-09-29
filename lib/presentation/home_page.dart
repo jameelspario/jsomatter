@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:webjason/presentation/view/logger/logger_view.dart';
-import 'package:webjason/utils/extensions.dart';
+import '/presentation/view/logger/logger_view.dart';
 
+import '../utils/extensions.dart';
 import 'controllers/home_page_controller.dart';
 import 'controllers/logger_controller.dart';
 import 'view/tabs_home/tab_home.dart';
-import 'view/test/draggable2.dart';
-import 'view/test/reorderlist.dart';
 import 'view/viewer/viewer_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -25,26 +23,23 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           4.0.spaceY,
-          Obx(() => TabHome(
-            items: controller.tabsIndex,
-            selected: controller.selected,
-            onSelect: controller.onSelect,
-            onAdd: controller.onAdd,
-            onRemove: controller.onRemove,
-          onReorder: controller.onReorder),
+          Obx(
+            () => TabHome(
+                items: controller.tabsIndex,
+                selected: controller.selected,
+                onSelect: controller.onSelect,
+                onAdd: controller.onAdd,
+                onRemove: controller.onRemove,
+                onReorder: controller.onReorder),
           ),
           const Divider(height: 0),
-          // 2.0.spaceY,
-          // SizedBox(
-          //   height: 60,
-          //     child: ReorderList()),
           Expanded(child: ViewerPage()),
-         LoggerView(),
-          Obx(()=> Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            child: Text("line:${controller.lineNumber} col:${controller.columnNumber.value}"),
-          )),
-
+          LoggerView(),
+          Obx(() => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Text(
+                    "line:${controller.lineNumber} col:${controller.columnNumber.value}"),
+              )),
         ],
       ),
     );

@@ -10,12 +10,15 @@ class HomePageController extends GetxController {
   final LoggerController logger = Get.find();
 
   int count = 0;
- final _selected = TabModel().obs;
+  final _selected = TabModel().obs;
   RxList<TabModel> tabsIndex = <TabModel>[].obs;
+
   TabModel get selected => _selected.value;
-  select(TabModel val){
+
+  select(TabModel val) {
     _selected(val);
   }
+
   int state = 0;
 
   final utils = Utils();
@@ -24,7 +27,8 @@ class HomePageController extends GetxController {
   // final JsonTextFieldController controller = JsonTextFieldController();
 
   var txtSize = 16.0.obs;
-
+  var isBold = 0.obs;
+  var isItalic = 0.obs;
 
   onSelect(TabModel m) {
     saveOldSelection();
@@ -51,32 +55,38 @@ class HomePageController extends GetxController {
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
-    final item = tabsIndex
-        .removeAt(oldIndex); // Remove the item from the old position
+    final item =
+        tabsIndex.removeAt(oldIndex); // Remove the item from the old position
     tabsIndex.insert(newIndex, item);
   }
 
-  saveOldSelection(){
+  saveOldSelection() {
     selected.data = txtController.text;
     selected.txtSize = txtSize.value;
+    selected.isBold = isBold.value;
+    selected.isItalic = isItalic.value;
     selected.state = state;
   }
 
-  resetSelection(){
+  resetSelection() {
     txtController.text = "";
     txtSize.value = 16.0;
+    isBold.value = 0;
+    isItalic.value = 0;
     state = 0;
   }
 
-  assignSelection(TabModel m){
+  assignSelection(TabModel m) {
     txtController.text = m.data;
     txtSize.value = m.txtSize;
+    isBold.value = m.isBold;
+    isItalic.value = m.isItalic;
     state = m.state;
   }
 
-  TabModel tabinit(){
+  TabModel tabinit() {
     final model = TabModel(
-      id:count++,
+      id: count++,
       name: count,
     );
     return model;
@@ -87,13 +97,12 @@ class HomePageController extends GetxController {
     super.onInit();
     onAdd();
     txtController.addListener(_onTextChanged);
-
   }
 
   int lineNumber = 1;
   var columnNumber = 1.obs;
 
-  _onTextChanged(){
+  _onTextChanged() {
     final text = txtController.text;
     final cursorPosition = txtController.selection.baseOffset;
 
@@ -122,16 +131,21 @@ class HomePageController extends GetxController {
     // Determine the column number
     final column = cursorPosition - charsCount + 1;
 
-      lineNumber = line;
-      columnNumber.value = column;
+    lineNumber = line;
+    columnNumber.value = column;
   }
-
-
-
 
   onSizeChange(double size) {
     print("-------$size");
     txtSize.value = size;
+  }
+
+  onBold() {
+    isBold.value = isBold.value == 1 ? 0 : 1;
+  }
+
+  onItalic() {
+    isItalic.value = isItalic.value == 1 ? 0 : 1;
   }
 
   onOptionMenu(String val) async {
@@ -153,27 +167,27 @@ class HomePageController extends GetxController {
     } else if (val == "Remove white space") {
       state = 2;
     } else if (val == "Clear") {
-      txtController.text="";
+      txtController.text = "";
     } else if (val == "Load JSON data") {}
   }
 
-  onFormat(){
+  onFormat() {
     final str = txtController.text;
     // if(!Utils.isValidJsonIgnoringQuotes(str)){
     //   ShowToastDialog.showToast("Invalid JSON");
     //   return;
     // }
-    if(str.isEmpty){
+    if (str.isEmpty) {
       return;
     }
 
     try {
       final pretty = Utils.prettify(str);
       txtController.text = pretty;
-    }catch(e){
+    } catch (e) {
       print("-- $e");
       final json = Utils.jsonifyString(str);
-      if(!Utils.isValidJSON(json)){
+      if (!Utils.isValidJSON(json)) {
         logger.logger("$e".replaceAll("FormatException: SyntaxError:", ""));
         ShowToastDialog.showToast("Invalid JSON");
         return;
@@ -183,11 +197,10 @@ class HomePageController extends GetxController {
     }
   }
 
-  compactJson(){
+  compactJson() {
     final str = txtController.text;
     // final json = Utils.jsonifyString(str);
     String compactJson = Utils.compactJson(str);
     txtController.text = compactJson;
   }
-
 }

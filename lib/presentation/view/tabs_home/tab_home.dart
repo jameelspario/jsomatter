@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:webjason/utils/extensions.dart';
 
+import '../../../utils/extensions.dart';
 import '../../../domain/tab_model.dart';
 import '../../widgets/widgets.dart';
 
