@@ -6,6 +6,8 @@ import 'package:webjason/utils/extensions.dart';
 import 'controllers/home_page_controller.dart';
 import 'controllers/logger_controller.dart';
 import 'view/tabs_home/tab_home.dart';
+import 'view/test/draggable2.dart';
+import 'view/test/reorderlist.dart';
 import 'view/viewer/viewer_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -28,10 +30,14 @@ class HomePage extends StatelessWidget {
             selected: controller.selected,
             onSelect: controller.onSelect,
             onAdd: controller.onAdd,
-            onRemove: controller.onRemove,),
+            onRemove: controller.onRemove,
+          onReorder: controller.onReorder),
           ),
-          const Divider(height: 0,),
+          const Divider(height: 0),
           // 2.0.spaceY,
+          // SizedBox(
+          //   height: 60,
+          //     child: ReorderList()),
           Expanded(child: ViewerPage()),
          LoggerView(),
           Obx(()=> Padding(

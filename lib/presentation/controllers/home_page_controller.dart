@@ -47,6 +47,15 @@ class HomePageController extends GetxController {
     select(val);
   }
 
+  void onReorder(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    final item = tabsIndex
+        .removeAt(oldIndex); // Remove the item from the old position
+    tabsIndex.insert(newIndex, item);
+  }
+
   saveOldSelection(){
     selected.data = txtController.text;
     selected.txtSize = txtSize.value;
