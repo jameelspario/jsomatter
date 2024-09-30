@@ -18,30 +18,34 @@ class OptionMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (final it in DemoData.items)
-          ItemOption(
-            it,
-            callback: () => callback?.call(it),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final it in DemoData.items)
+            ItemOption(
+              it,
+              callback: () => callback?.call(it),
+            ),
+          4.0.spaceX,
+          const SizedBox(
+              height: 20,
+              child: VerticalDivider(
+                width: 5,
+                color: Colors.black54,
+                thickness: 1,
+              )),
+          4.0.spaceX,
+          TextFormatting(
+            onSizeChange: onSizeChange,
+            isBold: isBold,
+            isItalic: isItalic,
+            onBold: onBold,
+            onItalic: onItalic,
           ),
-        4.0.spaceX,
-        const SizedBox(
-            height: 20,
-            child: VerticalDivider(
-              width: 5,
-              color: Colors.black54,
-              thickness: 1,
-            )),
-        4.0.spaceX,
-        TextFormatting(
-          onSizeChange: onSizeChange,
-          isBold: isBold,
-          isItalic: isItalic,
-          onBold: onBold,
-          onItalic: onItalic,
-        ),
-      ],
+          4.0.spaceX,
+        ],
+      ),
     );
   }
 }

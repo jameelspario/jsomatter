@@ -20,6 +20,7 @@ class ViewerPage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             OptionMenu(
               callback: homeController.onOptionMenu,
