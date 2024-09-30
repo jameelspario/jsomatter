@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:resizable_widget/resizable_widget.dart';
 import '/presentation/view/logger/logger_view.dart';
 
 import '../utils/extensions.dart';
@@ -33,8 +34,19 @@ class HomePage extends StatelessWidget {
                 onReorder: controller.onReorder),
           ),
           const Divider(height: 0),
-          Expanded(child: ViewerPage()),
-          LoggerView(),
+          Expanded(
+            child: ResizableWidget(
+              children: [
+                ViewerPage(),
+                LoggerView(),
+              ],
+              isHorizontalSeparator: true,
+              isDisabledSmartHide: true,
+              separatorColor: Colors.grey,
+              separatorSize: 4,
+              percentages: [0.95, 0.05],
+            ),
+          ),
           Obx(() => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 child: Text(
