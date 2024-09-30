@@ -95,12 +95,14 @@ class _TextSizeChangeState extends State<TextSizeChange> {
             onPressed: _incrementCounter,
           ),
         ),
+        4.0.spaceX,
         Obx(
           () => Text(
             "${homeController.txtSize.value}",
             style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
           ),
         ),
+        4.0.spaceX,
         CircleAvatar(
           backgroundColor: Colors.transparent,
           radius: 14,

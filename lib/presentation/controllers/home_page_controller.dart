@@ -23,7 +23,6 @@ class HomePageController extends GetxController {
 
   final utils = Utils();
   final TextEditingController txtController = TextEditingController();
-
   // final JsonTextFieldController controller = JsonTextFieldController();
 
   var txtSize = 16.0.obs;

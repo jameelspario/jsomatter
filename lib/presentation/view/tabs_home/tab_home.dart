@@ -33,20 +33,6 @@ class TabHome extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(
-            // child: SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(
-            //     children: [
-            //       for (final it in items)
-            //         ItemTab(
-            //           item: it,
-            //           selected: selected,
-            //           callback: () => onSelect?.call(it),
-            //           onRemove: () => onRemove?.call(it),
-            //         ),
-            //     ],
-            //   ),
-            // ),
             child: SizedBox(
                 height: 20,
                 child: DraggableTabs(
@@ -98,8 +84,16 @@ class _DraggableTabsState extends State<DraggableTabs> {
     return ReorderableListView.builder(
       shrinkWrap: true,
       proxyDecorator: (child, index, anim) {
-        return child;
+        // return child;
+        return Material(
+          color: Colors.transparent, // Use transparent background
+          child: Opacity(
+            opacity: 1.0, // Keep full opacity
+            child: child,
+          ),
+        );
       },
+      // prototypeItem: Container(width: 100, height: 10, color: Colors.blue,),
       buildDefaultDragHandles: false,
       scrollDirection: Axis.horizontal,
       itemCount: widget.items.length,
@@ -135,10 +129,10 @@ class ItemTab extends StatelessWidget {
     final bool isSelected = selected?.id == item.id;
     return Padding(
       padding: const EdgeInsets.only(right: 2),
-      child: Hoverable(
+      child: InkWell(
         hoverColor: Colors.indigoAccent.shade100,
-        corner: 5.0,
-        callback: () => callback?.call(),
+        borderRadius: BorderRadius.vertical(top:Radius.circular(5)),
+        onTap: () => callback?.call(),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           decoration: BoxDecoration(
