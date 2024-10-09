@@ -60,6 +60,11 @@ class Utils {
     }
   }
 
+
+  /*
+  *
+  *
+  * */
   copytoclipboard(String text) {
     Clipboard.setData(ClipboardData(text: text)).then((_) {
       ShowToastDialog.showToast("Copied to clipboard");

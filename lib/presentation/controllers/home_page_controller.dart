@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 
 import '../../domain/tab_model.dart';
 import '../../utils/utils.dart';
+import '../view/json_formatter/json_text_field_controller.dart';
+import '../view/json_formatter/json_utils.dart';
 import '../widgets/show_toast_dialog.dart';
 import 'logger_controller.dart';
 
@@ -22,8 +24,8 @@ class HomePageController extends GetxController {
   int state = 0;
 
   final utils = Utils();
-  final TextEditingController txtController = TextEditingController();
-  // final JsonTextFieldController controller = JsonTextFieldController();
+  // final TextEditingController txtController = TextEditingController();
+  final JsonTextFieldController controller = JsonTextFieldController();
 
   var txtSize = 16.0.obs;
   var isBold = 0.obs;
@@ -60,7 +62,7 @@ class HomePageController extends GetxController {
   }
 
   saveOldSelection() {
-    selected.data = txtController.text;
+    selected.data = controller.text;
     selected.txtSize = txtSize.value;
     selected.isBold = isBold.value;
     selected.isItalic = isItalic.value;
@@ -68,7 +70,7 @@ class HomePageController extends GetxController {
   }
 
   resetSelection() {
-    txtController.text = "";
+    controller.text = "";
     txtSize.value = 16.0;
     isBold.value = 0;
     isItalic.value = 0;
@@ -76,7 +78,7 @@ class HomePageController extends GetxController {
   }
 
   assignSelection(TabModel m) {
-    txtController.text = m.data;
+    controller.text = m.data;
     txtSize.value = m.txtSize;
     isBold.value = m.isBold;
     isItalic.value = m.isItalic;
@@ -95,15 +97,15 @@ class HomePageController extends GetxController {
   void onInit() {
     super.onInit();
     onAdd();
-    txtController.addListener(_onTextChanged);
+    controller.addListener(_onTextChanged);
   }
 
   int lineNumber = 1;
   var columnNumber = 1.obs;
 
   _onTextChanged() {
-    final text = txtController.text;
-    final cursorPosition = txtController.selection.baseOffset;
+    final text = controller.text;
+    final cursorPosition = controller.selection.baseOffset;
 
     if (cursorPosition == -1) {
       return; // No cursor
@@ -151,9 +153,9 @@ class HomePageController extends GetxController {
     print(val);
     if (val == "Paste") {
       final data = await utils.pasteFromClipboard();
-      txtController.text = txtController.text + data ?? "";
+      controller.text = controller.text + data ?? "";
     } else if (val == "Copy") {
-      final data = txtController.text;
+      final data = controller.text;
       if (data.isNotEmpty) {
         utils.copytoclipboard(data);
       }
@@ -164,14 +166,15 @@ class HomePageController extends GetxController {
       state = 1;
       print("---formatted----------");
     } else if (val == "Remove white space") {
+      compactJson();
       state = 2;
     } else if (val == "Clear") {
-      txtController.text = "";
+      controller.text = "";
     } else if (val == "Load JSON data") {}
   }
 
   onFormat() {
-    final str = txtController.text;
+    final str = controller.text;
     // if(!Utils.isValidJsonIgnoringQuotes(str)){
     //   ShowToastDialog.showToast("Invalid JSON");
     //   return;
@@ -181,25 +184,32 @@ class HomePageController extends GetxController {
     }
 
     try {
-      final pretty = Utils.prettify(str);
-      txtController.text = pretty;
+      // final pretty = Utils.prettify(str);
+      // controller.text = pretty;
+      controller.formatJson(sortJson: false);
     } catch (e) {
       print("-- $e");
       final json = Utils.jsonifyString(str);
-      if (!Utils.isValidJSON(json)) {
-        logger.logger("$e".replaceAll("FormatException: SyntaxError:", ""));
+      // logger.logger(json);
+      controller.text = json;
+      controller.formatJson(sortJson: false);
+
+      if (!JsonUtils.isValidJson(json)) {
+        logger.logger("${JsonUtils.getJsonParsingError(json)}".replaceAll("FormatException: SyntaxError:", ""));
         ShowToastDialog.showToast("Invalid JSON");
         return;
       }
-      final pretty = Utils.prettify(json);
-      txtController.text = pretty.replaceAll("\"", "");
+      // final pretty = Utils.prettify(json);
+      // controller.text = pretty.replaceAll("\"", "");
+
+
     }
   }
 
   compactJson() {
-    final str = txtController.text;
+    final str = controller.text;
     // final json = Utils.jsonifyString(str);
     String compactJson = Utils.compactJson(str);
-    txtController.text = compactJson;
+    controller.text = compactJson;
   }
 }

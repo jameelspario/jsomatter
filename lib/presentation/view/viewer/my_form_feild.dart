@@ -43,6 +43,7 @@ class MyWidget extends StatelessWidget {
               enabledBorder: const UnderlineInputBorder(
                 borderSide: BorderSide.none,
               ),
+
               hoverColor: Colors.white,
               filled: true,
               fillColor: Colors.white,
