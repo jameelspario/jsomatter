@@ -3,9 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../utils/extensions.dart';
 import '../../controllers/home_page_controller.dart';
-import '../../widgets/my_container.dart';
 import '../test/json_text_test.dart';
-import 'my_form_feild.dart';
 import 'option_menu.dart';
 
 class ViewerPage extends StatelessWidget {

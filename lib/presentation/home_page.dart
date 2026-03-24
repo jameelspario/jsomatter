@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jsomatter/presentation/view/logger/logger_view.dart';
 import 'package:resizable_widget/resizable_widget.dart';
-import '/presentation/view/logger/logger_view.dart';
 
 import '../utils/extensions.dart';
 import 'controllers/home_page_controller.dart';

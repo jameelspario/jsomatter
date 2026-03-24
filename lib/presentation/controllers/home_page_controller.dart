@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../domain/tab_model.dart';
@@ -175,34 +174,34 @@ class HomePageController extends GetxController {
 
   onFormat() {
     final str = controller.text;
-    // if(!Utils.isValidJsonIgnoringQuotes(str)){
-    //   ShowToastDialog.showToast("Invalid JSON");
-    //   return;
-    // }
     if (str.isEmpty) {
       return;
     }
 
     try {
-      // final pretty = Utils.prettify(str);
-      // controller.text = pretty;
       controller.formatJson(sortJson: false);
     } catch (e) {
       print("-- $e");
-      final json = Utils.jsonifyString(str);
-      // logger.logger(json);
-      controller.text = json;
-      controller.formatJson(sortJson: false);
+      final jsonified = Utils.jsonifyString(str);
+      controller.text = jsonified;
 
-      if (!JsonUtils.isValidJson(json)) {
-        logger.logger("${JsonUtils.getJsonParsingError(json)}".replaceAll("FormatException: SyntaxError:", ""));
-        ShowToastDialog.showToast("Invalid JSON");
-        return;
+      try {
+        controller.formatJson(sortJson: false);
+      } catch (e2) {
+        print("-- second format attempt failed: $e2");
+        if (!JsonUtils.isValidJson(controller.text)) {
+          // If still invalid, try one last repair manually to show user
+          final repaired = JsonUtils.repairJson(controller.text);
+          if (JsonUtils.isValidJson(repaired)) {
+            controller.text = repaired;
+            controller.formatJson(sortJson: false);
+          } else {
+            logger.logger("${JsonUtils.getJsonParsingError(controller.text)}"
+                .replaceAll("FormatException: SyntaxError:", ""));
+            ShowToastDialog.showToast("Invalid JSON");
+          }
+        }
       }
-      // final pretty = Utils.prettify(json);
-      // controller.text = pretty.replaceAll("\"", "");
-
-
     }
   }
 

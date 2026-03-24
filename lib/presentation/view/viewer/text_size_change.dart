@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 
 import '../../../utils/extensions.dart';
 import '../../controllers/home_page_controller.dart';
-import '../../widgets/widgets.dart';
 
 class TextSizeChange extends StatefulWidget {
   const TextSizeChange({this.callback, super.key});
@@ -71,7 +70,6 @@ class _TextSizeChangeState extends State<TextSizeChange> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -79,7 +77,6 @@ class _TextSizeChangeState extends State<TextSizeChange> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-
         CircleAvatar(
           backgroundColor: Colors.transparent,
           radius: 14,
@@ -99,7 +96,8 @@ class _TextSizeChangeState extends State<TextSizeChange> {
         Obx(
           () => Text(
             "${homeController.txtSize.value}",
-            style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+                color: Colors.grey, fontWeight: FontWeight.w600),
           ),
         ),
         4.0.spaceX,
@@ -118,7 +116,6 @@ class _TextSizeChangeState extends State<TextSizeChange> {
             onPressed: _decrementCounter,
           ),
         )
-
       ],
     );
   }

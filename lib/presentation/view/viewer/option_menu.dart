@@ -4,10 +4,16 @@ import '../../../utils/extensions.dart';
 import '../../../data/demo_data.dart';
 import 'item_option.dart';
 import 'text_formatting.dart';
-import 'text_size_change.dart';
 
 class OptionMenu extends StatelessWidget {
-  const OptionMenu({this.callback, this.onSizeChange, this.isBold, this.isItalic, this.onBold, this.onItalic, super.key});
+  const OptionMenu(
+      {this.callback,
+      this.onSizeChange,
+      this.isBold,
+      this.isItalic,
+      this.onBold,
+      this.onItalic,
+      super.key});
 
   final Function(String item)? callback;
   final Function(double size)? onSizeChange;

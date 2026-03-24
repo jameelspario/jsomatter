@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../utils/extensions.dart';
 import '../../../domain/tab_model.dart';
-import '../../widgets/widgets.dart';
 
 typedef BuilderItem = Widget Function(dynamic it, int index);
 
@@ -131,7 +130,7 @@ class ItemTab extends StatelessWidget {
       padding: const EdgeInsets.only(right: 2),
       child: InkWell(
         hoverColor: Colors.indigoAccent.shade100,
-        borderRadius: BorderRadius.vertical(top:Radius.circular(5)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
         onTap: () => callback?.call(),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
