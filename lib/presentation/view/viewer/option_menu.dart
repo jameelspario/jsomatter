@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../../utils/extensions.dart';
@@ -17,6 +18,7 @@ class OptionMenu extends StatelessWidget {
       this.onBold,
       this.onItalic,
       this.onDark,
+      this.onProfile,
       super.key});
 
   final Function(String item)? callback;
@@ -27,6 +29,7 @@ class OptionMenu extends StatelessWidget {
   final VoidCallback? onBold;
   final VoidCallback? onItalic;
   final VoidCallback? onDark;
+  final VoidCallback? onProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +67,17 @@ class OptionMenu extends StatelessWidget {
                 4.0.spaceX,
                 Obx(
                   () => IconButton(
-                    icon: Icon(
-                      isDark?.value == 1 ? Icons.dark_mode : Icons.light_mode,
+                    // icon: Icon(
+                    //   isDark?.value == 1 ? Icons.dark_mode : Icons.light_mode,
+                    // ),
+                    icon: SvgPicture.asset(isDark?.value == 1 ? "assets/svg/dark-mode.svg": "assets/svg/light-mode.svg" ,
+                        width: 18,
+                        colorFilter: ColorFilter.mode(
+                          (isDark.value == 1)
+                              ? Colors.white
+                              : Colors.grey,
+                          BlendMode.srcIn,
+                        )
                     ),
                     tooltip: isDark?.value == 1
                         ? 'Switch to Light Mode'
@@ -78,17 +90,16 @@ class OptionMenu extends StatelessWidget {
           ),
         ),
         CircleAvatar(
-          backgroundColor: Colors.grey,
+          // backgroundColor: Colors.transparent,
           radius: 14,
           child: IconButton(
-            padding: EdgeInsets.zero, // 🔥 remove default padding
-            constraints: BoxConstraints(), // 🔥 remove extra space
-            icon: Icon(
-              isDark?.value == 1 ? Icons.person : Icons.person_2_outlined,
-              size: 16, // adjust to fit inside circle
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(),
+            icon: SvgPicture.asset( "assets/svg/person.svg" ,
+                width: 24,
             ),
             tooltip: 'profile',
-            onPressed: onDark,
+            onPressed: onProfile,
           ),
         ),
         18.0.spaceX,
