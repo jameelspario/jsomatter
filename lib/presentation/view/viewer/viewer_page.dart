@@ -37,24 +37,7 @@ class ViewerPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: LayoutBuilder(builder: (context, con) {
-                  // return MyContainer(
-                  //     borderWidth: 1,
-                  //     borderColor: Colors.black45,
-                  //     radius: 5.0,
-                  //     child: Obx(() => MyWidget(
-                  //           controller: homeController.txtController,
-                  //           txtSize: homeController.txtSize.value,
-                  //           isBold: homeController.isBold.value,
-                  //           isItalic: homeController.isItalic.value,
-                  //         )));
-
-                  return JsonBeautifierPage();
-                  // return Obx(() => JsonTextTest(
-                  //       controller: homeController.controller,
-                  //       txtSize: homeController.txtSize.value,
-                  //       isBold: homeController.isBold.value,
-                  //       isItalic: homeController.isItalic.value,
-                  //     ));
+                  return const JsonBeautifierPage();
                 }),
               ),
             ),
