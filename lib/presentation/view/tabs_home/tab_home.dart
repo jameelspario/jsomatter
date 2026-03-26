@@ -156,6 +156,7 @@ class ItemTab extends StatelessWidget {
               border: Border(right: BorderSide(width: 1, color: borderColor)),
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SvgPicture.asset("assets/svg/json.svg",
                     width: 18,

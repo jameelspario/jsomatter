@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 
 import '../../domain/tab_model.dart';
@@ -31,6 +32,9 @@ class HomePageController extends GetxController {
   var isBold = 0.obs;
   var isItalic = 0.obs;
   var isDark = 0.obs;
+
+  // Signal so JsonBeautifierPage can subscribe and run beautify
+  final beautifySignal = StreamController<void>.broadcast();
 
   onSelect(TabModel m) {
     saveOldSelection();
@@ -158,18 +162,16 @@ class HomePageController extends GetxController {
     print(val);
     if (val == "Paste") {
       final data = await utils.pasteFromClipboard();
-      controller.text = controller.text + data ?? "";
+      controller.text = controller.text + (data ?? "");
     } else if (val == "Copy") {
       final data = controller.text;
       if (data.isNotEmpty) {
         utils.copytoclipboard(data);
       }
     } else if (val == "Format") {
-      // controller.formatJson(sortJson: false);
-      print("---formatting----------");
-      onFormat();
+      print("---beautify signal----------");
+      beautifySignal.add(null);
       state = 1;
-      print("---formatted----------");
     } else if (val == "Remove white space") {
       compactJson();
       state = 2;
@@ -213,8 +215,13 @@ class HomePageController extends GetxController {
 
   compactJson() {
     final str = controller.text;
-    // final json = Utils.jsonifyString(str);
     String compactJson = Utils.compactJson(str);
     controller.text = compactJson;
+  }
+
+  @override
+  void onClose() {
+    beautifySignal.close();
+    super.onClose();
   }
 }

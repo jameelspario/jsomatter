@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:jsomatter/utils/FormatUtils.dart';
 
@@ -12,12 +12,25 @@ class JsonBeautifierPage extends StatefulWidget {
 }
 
 class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
-  final _controller = TextEditingController();
+  // Use the shared controller so option-menu actions (Format/Paste/Copy/Clear)
+  // operate on exactly the same text that this editor displays.
+  late final HomePageController homeController;
   final _focusNode = FocusNode();
   final format = FormatUtils();
-  final homeController = Get.find<HomePageController>();
 
   List<InlineSpan>? _richSpans;
+  StreamSubscription<void>? _beautifySub;
+
+  @override
+  void initState() {
+    super.initState();
+    homeController = Get.find<HomePageController>();
+    // Listen for external text changes (tab switch, paste, format, clear…)
+    homeController.controller.addListener(_onControllerChanged);
+    // Listen for beautify requests from the option menu
+    _beautifySub =
+        homeController.beautifySignal.stream.listen((_) => _beautify());
+  }
 
   // ── Theme helpers ─────────────────────────────────────────────────────────
 
@@ -39,7 +52,7 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
   // ── Beautify ──────────────────────────────────────────────────────────────
 
   void _beautify() {
-    final input = _controller.text.trim();
+    final input = homeController.controller.text.trim();
     if (input.isEmpty) {
       setState(() => _richSpans = null);
       return;
@@ -55,29 +68,19 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
             ))
         .toList();
 
-    _controller.value = TextEditingValue(
+    homeController.controller.value = TextEditingValue(
       text: result.raw,
       selection: TextSelection.collapsed(offset: result.raw.length),
     );
 
-    setState(() {
-      _richSpans = spans;
-    });
+    setState(() => _richSpans = spans);
   }
 
-  // ── Clear ─────────────────────────────────────────────────────────────────
-
-  void _clear() {
-    _controller.clear();
-    setState(() => _richSpans = null);
-  }
-
-  // ── Copy ──────────────────────────────────────────────────────────────────
-
-  Future<void> _copy() async {
-    final text = _controller.text;
-    if (text.isEmpty) return;
-    await Clipboard.setData(ClipboardData(text: text));
+  // Drop coloring whenever text changes (user typed, pasted, cleared, etc.)
+  void _onControllerChanged() {
+    if (_richSpans != null) {
+      setState(() => _richSpans = null);
+    }
   }
 
   void _onTextChanged(String _) {
@@ -87,12 +90,15 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      // Read isDark so Obx tracks it and rebuilds on toggle
+      // Track all reactive values so Obx rebuilds on any change
       homeController.isDark.value;
+      final fontSize = homeController.txtSize.value;
+      final isBold = homeController.isBold.value == 1;
+      final isItalic = homeController.isItalic.value == 1;
+
       return Scaffold(
         backgroundColor: _bgColor,
         body: SafeArea(
@@ -100,8 +106,13 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
             children: [
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                  child: _buildEditorPanel(),
+                  padding:
+                      const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  child: _buildEditorPanel(
+                    fontSize: fontSize,
+                    isBold: isBold,
+                    isItalic: isItalic,
+                  ),
                 ),
               ),
             ],
@@ -111,7 +122,11 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
     });
   }
 
-  Widget _buildEditorPanel() {
+  Widget _buildEditorPanel({
+    required double fontSize,
+    required bool isBold,
+    required bool isItalic,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: _panelColor,
@@ -121,14 +136,34 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(child: _buildEditor()),
+          Expanded(
+            child: _buildEditor(
+              fontSize: fontSize,
+              isBold: isBold,
+              isItalic: isItalic,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildEditor() {
+  // ── The editor ────────────────────────────────────────────────────────────
+
+  Widget _buildEditor({
+    required double fontSize,
+    required bool isBold,
+    required bool isItalic,
+  }) {
     final bool isBeautified = _richSpans != null;
+
+    final editorStyle = TextStyle(
+      fontSize: fontSize,
+      height: 1.6,
+      fontFamily: 'monospace',
+      fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+      fontStyle: isItalic ? FontStyle.italic : FontStyle.normal,
+    );
 
     return Stack(
       children: [
@@ -141,12 +176,7 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
               child: RichText(
                 text: TextSpan(
                   children: _richSpans,
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    height: 1.6,
-                    fontFamily: 'monospace',
-                    color: _textColor,
-                  ),
+                  style: editorStyle.copyWith(color: _textColor),
                 ),
               ),
             ),
@@ -154,24 +184,20 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
 
         // ── Editable TextField ──────────────────────────────────────
         TextField(
-          controller: _controller,
+          controller: homeController.controller,
           focusNode: _focusNode,
           maxLines: null,
           expands: true,
           onChanged: _onTextChanged,
-          style: TextStyle(
+          style: editorStyle.copyWith(
+            // Transparent when beautified so rich layer shows through
             color: isBeautified ? Colors.transparent : _textColor,
-            fontSize: 13.5,
-            height: 1.6,
-            fontFamily: 'monospace',
           ),
           cursorColor: _cursorColor,
           decoration: InputDecoration(
             border: InputBorder.none,
             contentPadding: const EdgeInsets.all(14),
-            hintText: isBeautified
-                ? null
-                : 'Paste your JSON here and click Beautify…',
+            hintText: isBeautified ? null : 'Paste your JSON here…',
             hintStyle: TextStyle(color: _hintColor),
           ),
         ),
@@ -181,7 +207,8 @@ class _JsonBeautifierPageState extends State<JsonBeautifierPage> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    homeController.controller.removeListener(_onControllerChanged);
+    _beautifySub?.cancel();
     _focusNode.dispose();
     super.dispose();
   }
