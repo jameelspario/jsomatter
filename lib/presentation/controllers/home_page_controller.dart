@@ -23,12 +23,14 @@ class HomePageController extends GetxController {
   int state = 0;
 
   final utils = Utils();
+
   // final TextEditingController txtController = TextEditingController();
   final JsonTextFieldController controller = JsonTextFieldController();
 
   var txtSize = 16.0.obs;
   var isBold = 0.obs;
   var isItalic = 0.obs;
+  var isDark = 0.obs;
 
   onSelect(TabModel m) {
     saveOldSelection();
@@ -146,6 +148,10 @@ class HomePageController extends GetxController {
 
   onItalic() {
     isItalic.value = isItalic.value == 1 ? 0 : 1;
+  }
+
+  onDark() {
+    isDark.value = isDark.value == 1 ? 0 : 1;
   }
 
   onOptionMenu(String val) async {

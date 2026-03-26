@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ItemOption extends StatefulWidget {
-  const ItemOption(this.text, {required this.callback, super.key});
+  const ItemOption(this.text, {required this.callback, this.isDark = false, super.key});
   final String text;
   final VoidCallback callback;
+  final bool isDark;
 
   @override
   State<ItemOption> createState() => _ItemOptionState();
@@ -31,7 +32,11 @@ class _ItemOptionState extends State<ItemOption> {
           child: Text(
             widget.text,
             style: TextStyle(
-                fontSize: 14, color: isHovering ? Colors.white : null),
+              fontSize: 14,
+              color: isHovering
+                  ? Colors.white
+                  : (widget.isDark ? const Color(0xFFE6EDF3) : Colors.black87),
+            ),
           ),
         ),
       ),

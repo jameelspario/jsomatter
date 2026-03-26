@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 import '../../../utils/extensions.dart';
 import '../../../domain/tab_model.dart';
+import '../../controllers/home_page_controller.dart';
 
 typedef BuilderItem = Widget Function(dynamic it, int index);
 
@@ -49,7 +51,16 @@ class TabHome extends StatelessWidget {
                   },
                 )),
           ),
-          InkWell(onTap: onAdd, child: const Icon(Icons.add))
+          Obx(() {
+            final isDark = Get.find<HomePageController>().isDark.value == 1;
+            return InkWell(
+              onTap: onAdd,
+              child: Icon(
+                Icons.add,
+                color: isDark ? const Color(0xFF8B949E) : Colors.black54,
+              ),
+            );
+          })
         ],
       ),
     );
@@ -83,16 +94,11 @@ class _DraggableTabsState extends State<DraggableTabs> {
     return ReorderableListView.builder(
       shrinkWrap: true,
       proxyDecorator: (child, index, anim) {
-        // return child;
         return Material(
-          color: Colors.transparent, // Use transparent background
-          child: Opacity(
-            opacity: 1.0, // Keep full opacity
-            child: child,
-          ),
+          color: Colors.transparent,
+          child: Opacity(opacity: 1.0, child: child),
         );
       },
-      // prototypeItem: Container(width: 100, height: 10, color: Colors.blue,),
       buildDefaultDragHandles: false,
       scrollDirection: Axis.horizontal,
       itemCount: widget.items.length,
@@ -119,63 +125,75 @@ class ItemTab extends StatelessWidget {
 
   final TabModel item;
   final TabModel? selected;
-
   final VoidCallback? callback;
   final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
-    final bool isSelected = selected?.id == item.id;
-    return Padding(
-      padding: const EdgeInsets.only(right: 2),
-      child: InkWell(
-        hoverColor: Colors.indigoAccent.shade100,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
-        onTap: () => callback?.call(),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.indigoAccent : null,
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(5.0), topRight: Radius.circular(5)),
-            border: const Border(
-                right: BorderSide(width: 1, color: Colors.black45)),
-          ),
-          child: Row(
-            children: [
-              SvgPicture.asset("assets/svg/json.svg",
-                  width: 18,
-                  colorFilter: ColorFilter.mode(
-                    isSelected ? Colors.white : Colors.black38,
-                    BlendMode.srcIn,
-                  )),
-              2.0.spaceX,
-              Text(
-                "Tab ${item.name}",
-                style: TextStyle(color: isSelected ? Colors.white : null),
-              ),
-              selected?.id != item.id
-                  ? Container()
-                  : InkWell(
-                      onTap: onRemove,
-                      child: Row(
-                        children: [
-                          2.0.spaceX,
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Icon(
-                              Icons.close,
-                              size: 10,
-                              color: isSelected ? Colors.white : null,
+    final homeController = Get.find<HomePageController>();
+    return Obx(() {
+      final isDark = homeController.isDark.value == 1;
+      final bool isSelected = selected?.id == item.id;
+      final Color unselectedTextColor =
+          isDark ? const Color(0xFFE6EDF3) : Colors.black87;
+      final Color unselectedIconColor =
+          isDark ? const Color(0xFF8B949E) : Colors.black38;
+      final Color borderColor =
+          isDark ? const Color(0xFF30363D) : Colors.black45;
+
+      return Padding(
+        padding: const EdgeInsets.only(right: 2),
+        child: InkWell(
+          hoverColor: Colors.indigoAccent.shade100,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
+          onTap: () => callback?.call(),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.indigoAccent : null,
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(5.0), topRight: Radius.circular(5)),
+              border: Border(right: BorderSide(width: 1, color: borderColor)),
+            ),
+            child: Row(
+              children: [
+                SvgPicture.asset("assets/svg/json.svg",
+                    width: 18,
+                    colorFilter: ColorFilter.mode(
+                      isSelected ? Colors.white : unselectedIconColor,
+                      BlendMode.srcIn,
+                    )),
+                2.0.spaceX,
+                Text(
+                  "Tab ${item.name}",
+                  style: TextStyle(
+                      color: isSelected ? Colors.white : unselectedTextColor),
+                ),
+                selected?.id != item.id
+                    ? Container()
+                    : InkWell(
+                        onTap: onRemove,
+                        child: Row(
+                          children: [
+                            2.0.spaceX,
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Icon(
+                                Icons.close,
+                                size: 10,
+                                color: isSelected
+                                    ? Colors.white
+                                    : unselectedTextColor,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

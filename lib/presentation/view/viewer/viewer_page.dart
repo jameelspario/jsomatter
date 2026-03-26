@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../utils/extensions.dart';
 import '../../controllers/home_page_controller.dart';
+import '../editor/EditorPannel.dart';
 import '../test/json_text_test.dart';
 import 'option_menu.dart';
 
@@ -26,8 +27,10 @@ class ViewerPage extends StatelessWidget {
               onSizeChange: homeController.onSizeChange,
               isBold: homeController.isBold,
               isItalic: homeController.isItalic,
+              isDark: homeController.isDark,
               onBold: homeController.onBold,
               onItalic: homeController.onItalic,
+              onDark: homeController.onDark,
             ),
             4.0.spaceY,
             Expanded(
@@ -45,13 +48,13 @@ class ViewerPage extends StatelessWidget {
                   //           isItalic: homeController.isItalic.value,
                   //         )));
 
-                  // return Container();
-                  return Obx(() => JsonTextTest(
-                        controller: homeController.controller,
-                        txtSize: homeController.txtSize.value,
-                        isBold: homeController.isBold.value,
-                        isItalic: homeController.isItalic.value,
-                      ));
+                  return JsonBeautifierPage();
+                  // return Obx(() => JsonTextTest(
+                  //       controller: homeController.controller,
+                  //       txtSize: homeController.txtSize.value,
+                  //       isBold: homeController.isBold.value,
+                  //       isItalic: homeController.isItalic.value,
+                  //     ));
                 }),
               ),
             ),

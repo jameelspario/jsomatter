@@ -18,42 +18,52 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          4.0.spaceY,
-          Obx(
-            () => TabHome(
-                items: controller.tabsIndex,
-                selected: controller.selected,
-                onSelect: controller.onSelect,
-                onAdd: controller.onAdd,
-                onRemove: controller.onRemove,
-                onReorder: controller.onReorder),
-          ),
-          const Divider(height: 0),
-          Expanded(
-            child: ResizableWidget(
-              children: [
-                ViewerPage(),
-                LoggerView(),
-              ],
-              isHorizontalSeparator: true,
-              isDisabledSmartHide: true,
-              separatorColor: Colors.grey,
-              separatorSize: 4,
-              percentages: [0.95, 0.05],
+    return Obx(() {
+      final isDark = controller.isDark.value == 1;
+      return Scaffold(
+        // backgroundColor: isDark ? const Color(0xFF0D1117) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF0D1117) : const Color(0xFFF6F8FA),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            4.0.spaceY,
+            Obx(
+              () => TabHome(
+                  items: controller.tabsIndex,
+                  selected: controller.selected,
+                  onSelect: controller.onSelect,
+                  onAdd: controller.onAdd,
+                  onRemove: controller.onRemove,
+                  onReorder: controller.onReorder),
             ),
-          ),
-          Obx(() => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                child: Text(
-                    "line:${controller.lineNumber} col:${controller.columnNumber.value}"),
-              )),
-        ],
-      ),
-    );
+            const Divider(height: 0),
+            Expanded(
+              child: ResizableWidget(
+                children: [
+                  ViewerPage(),
+                  LoggerView(),
+                ],
+                isHorizontalSeparator: true,
+                isDisabledSmartHide: true,
+                separatorColor: Colors.grey,
+                separatorSize: 4,
+                percentages: [0.98, 0.02],
+              ),
+            ),
+            Obx(() => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: Text(
+                    "line:${controller.lineNumber} col:${controller.columnNumber.value}",
+                    style: TextStyle(
+                      color: controller.isDark.value == 1
+                          ? const Color(0xFF8B949E)
+                          : Colors.black54,
+                    ),
+                  ),
+                )),
+          ],
+        ),
+      );
+    });
   }
 }

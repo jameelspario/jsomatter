@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widget_previews.dart';
+import 'package:get/get.dart';
 
 import '../../../utils/extensions.dart';
 import '../../../data/demo_data.dart';
@@ -11,16 +13,20 @@ class OptionMenu extends StatelessWidget {
       this.onSizeChange,
       this.isBold,
       this.isItalic,
+      this.isDark,
       this.onBold,
       this.onItalic,
+      this.onDark,
       super.key});
 
   final Function(String item)? callback;
   final Function(double size)? onSizeChange;
   final dynamic isBold;
   final dynamic isItalic;
+  final dynamic isDark;
   final VoidCallback? onBold;
   final VoidCallback? onItalic;
+  final VoidCallback? onDark;
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +34,21 @@ class OptionMenu extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
+          16.0.spaceX,
           for (final it in DemoData.items)
-            ItemOption(
-              it,
-              callback: () => callback?.call(it),
-            ),
+            Obx(() => ItemOption(
+                  it,
+                  callback: () => callback?.call(it),
+                  isDark: isDark?.value == 1,
+                )),
           4.0.spaceX,
-          const SizedBox(
+          Obx(() => SizedBox(
               height: 20,
               child: VerticalDivider(
                 width: 5,
-                color: Colors.black54,
+                color: isDark?.value == 1 ? Colors.white38 : Colors.black54,
                 thickness: 1,
-              )),
+              ))),
           4.0.spaceX,
           TextFormatting(
             onSizeChange: onSizeChange,
@@ -50,8 +58,24 @@ class OptionMenu extends StatelessWidget {
             onItalic: onItalic,
           ),
           4.0.spaceX,
+          Obx(
+            () => IconButton(
+              icon: Icon(
+                isDark?.value == 1 ? Icons.dark_mode : Icons.light_mode,
+              ),
+              tooltip: isDark?.value == 1
+                  ? 'Switch to Light Mode'
+                  : 'Switch to Dark Mode',
+              onPressed: onDark,
+            ),
+          )
         ],
       ),
     );
   }
+}
+
+@Preview(name: 'My Sample Text')
+Widget mySampleText() {
+  return const Text('Hello, World!');
 }
