@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/tab_model.dart';
 import '../../utils/utils.dart';
@@ -101,8 +102,14 @@ class HomePageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _loadTheme();
     onAdd();
     controller.addListener(_onTextChanged);
+  }
+
+  _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    isDark.value = prefs.getInt('isDark') ?? 0;
   }
 
   int lineNumber = 1;
@@ -154,8 +161,10 @@ class HomePageController extends GetxController {
     isItalic.value = isItalic.value == 1 ? 0 : 1;
   }
 
-  onDark() {
+  onDark() async {
     isDark.value = isDark.value == 1 ? 0 : 1;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('isDark', isDark.value);
   }
 
   onOptionMenu(String val) async {

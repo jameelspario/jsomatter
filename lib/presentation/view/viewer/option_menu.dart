@@ -30,47 +30,69 @@ class OptionMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          16.0.spaceX,
-          for (final it in DemoData.items)
-            Obx(() => ItemOption(
-                  it,
-                  callback: () => callback?.call(it),
-                  isDark: isDark?.value == 1,
-                )),
-          4.0.spaceX,
-          Obx(() => SizedBox(
-              height: 20,
-              child: VerticalDivider(
-                width: 5,
-                color: isDark?.value == 1 ? Colors.white38 : Colors.black54,
-                thickness: 1,
-              ))),
-          4.0.spaceX,
-          TextFormatting(
-            onSizeChange: onSizeChange,
-            isBold: isBold,
-            isItalic: isItalic,
-            onBold: onBold,
-            onItalic: onItalic,
-          ),
-          4.0.spaceX,
-          Obx(
-            () => IconButton(
-              icon: Icon(
-                isDark?.value == 1 ? Icons.dark_mode : Icons.light_mode,
-              ),
-              tooltip: isDark?.value == 1
-                  ? 'Switch to Light Mode'
-                  : 'Switch to Dark Mode',
-              onPressed: onDark,
+    return Row(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                16.0.spaceX,
+                for (final it in DemoData.items)
+                  Obx(() => ItemOption(
+                        it,
+                        callback: () => callback?.call(it),
+                        isDark: isDark?.value == 1,
+                      )),
+                4.0.spaceX,
+                Obx(() => SizedBox(
+                    height: 20,
+                    child: VerticalDivider(
+                      width: 5,
+                      color:
+                          isDark?.value == 1 ? Colors.white38 : Colors.black54,
+                      thickness: 1,
+                    ))),
+                4.0.spaceX,
+                TextFormatting(
+                  onSizeChange: onSizeChange,
+                  isBold: isBold,
+                  isItalic: isItalic,
+                  onBold: onBold,
+                  onItalic: onItalic,
+                ),
+                4.0.spaceX,
+                Obx(
+                  () => IconButton(
+                    icon: Icon(
+                      isDark?.value == 1 ? Icons.dark_mode : Icons.light_mode,
+                    ),
+                    tooltip: isDark?.value == 1
+                        ? 'Switch to Light Mode'
+                        : 'Switch to Dark Mode',
+                    onPressed: onDark,
+                  ),
+                ),
+              ],
             ),
-          )
-        ],
-      ),
+          ),
+        ),
+        CircleAvatar(
+          backgroundColor: Colors.grey,
+          radius: 14,
+          child: IconButton(
+            padding: EdgeInsets.zero, // 🔥 remove default padding
+            constraints: BoxConstraints(), // 🔥 remove extra space
+            icon: Icon(
+              isDark?.value == 1 ? Icons.person : Icons.person_2_outlined,
+              size: 16, // adjust to fit inside circle
+            ),
+            tooltip: 'profile',
+            onPressed: onDark,
+          ),
+        ),
+        18.0.spaceX,
+      ],
     );
   }
 }

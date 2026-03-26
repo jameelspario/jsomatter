@@ -21,8 +21,8 @@ class HomePage extends StatelessWidget {
     return Obx(() {
       final isDark = controller.isDark.value == 1;
       return Scaffold(
-        // backgroundColor: isDark ? const Color(0xFF0D1117) : Colors.white,
-        backgroundColor: isDark ? const Color(0xFF0D1117) : const Color(0xFFF6F8FA),
+        backgroundColor:
+            isDark ? const Color(0xFF0D1117) : const Color(0xFFF6F8FA),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,7 +51,8 @@ class HomePage extends StatelessWidget {
               ),
             ),
             Obx(() => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                   child: Text(
                     "line:${controller.lineNumber} col:${controller.columnNumber.value}",
                     style: TextStyle(
