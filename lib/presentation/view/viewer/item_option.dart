@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ItemOption extends StatefulWidget {
   const ItemOption(this.text, {required this.callback, this.isDark = false, super.key});
@@ -13,18 +14,18 @@ class ItemOption extends StatefulWidget {
 class _ItemOptionState extends State<ItemOption> {
   bool isHovering = false;
 
-  IconData? _getIcon(String text) {
+  String? _getSvgPath(String text) {
     switch (text) {
       case "Paste":
-        return Icons.content_paste_rounded;
+        return "assets/svg/paste.svg";
       case "Copy":
-        return Icons.content_copy_rounded;
+        return "assets/svg/copy.svg";
       case "Format":
-        return Icons.auto_awesome_rounded;
+        return "assets/svg/format.svg";
       case "Remove white space":
-        return Icons.compress_rounded;
+        return "assets/svg/compress.svg";
       case "Clear":
-        return Icons.delete_outline_rounded;
+        return "assets/svg/clear.svg";
       default:
         return null;
     }
@@ -32,7 +33,7 @@ class _ItemOptionState extends State<ItemOption> {
 
   @override
   Widget build(BuildContext context) {
-    final icon = _getIcon(widget.text);
+    final svgPath = _getSvgPath(widget.text);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: InkWell(
@@ -65,13 +66,17 @@ class _ItemOptionState extends State<ItemOption> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[
-                Icon(
-                  icon,
-                  size: 14,
-                  color: isHovering
-                      ? Colors.indigoAccent
-                      : (widget.isDark ? const Color(0xFF8B949E) : Colors.black54),
+              if (svgPath != null) ...[
+                SvgPicture.asset(
+                  svgPath,
+                  width: 14,
+                  height: 14,
+                  colorFilter: ColorFilter.mode(
+                    isHovering
+                        ? Colors.indigoAccent
+                        : (widget.isDark ? const Color(0xFF8B949E) : Colors.black54),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 const SizedBox(width: 6),
               ],
