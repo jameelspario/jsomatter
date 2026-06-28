@@ -3,10 +3,13 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/tab_model.dart';
+import '../../domain/cloud_json_model.dart';
 import '../../utils/utils.dart';
+import '../../utils/cloud_storage_service.dart';
 import '../view/json_formatter/json_text_field_controller.dart';
 import '../view/json_formatter/json_utils.dart';
 import '../widgets/show_toast_dialog.dart';
+import '../widgets/profile_dialog.dart';
 import 'logger_controller.dart';
 
 class HomePageController extends GetxController {
@@ -33,6 +36,11 @@ class HomePageController extends GetxController {
   var isBold = 0.obs;
   var isItalic = 0.obs;
   var isDark = 0.obs;
+
+  // Cloud Save & Account Variables
+  var currentUserEmail = RxnString();
+  var savedJsons = <CloudJson>[].obs;
+  var cloudSyncMode = 'Local'.obs;
 
   // Signal so JsonBeautifierPage can subscribe and run beautify
   final beautifySignal = StreamController<void>.broadcast();
@@ -105,6 +113,111 @@ class HomePageController extends GetxController {
     _loadTheme();
     onAdd();
     controller.addListener(_onTextChanged);
+    _initCloudUser();
+  }
+
+  _initCloudUser() async {
+    if (CloudStorageManager.firebaseInitialized) {
+      cloudSyncMode.value = 'Firebase';
+    } else {
+      cloudSyncMode.value = 'Local';
+    }
+    currentUserEmail.value = CloudStorageManager.service.getCurrentUserEmail();
+    if (currentUserEmail.value != null) {
+      await refreshSavedJsons();
+    }
+  }
+
+  Future<void> refreshSavedJsons() async {
+    if (currentUserEmail.value != null) {
+      savedJsons.value = await CloudStorageManager.service.fetchSavedJsons();
+    }
+  }
+
+  onProfile() {
+    Get.dialog(const ProfileDialog());
+  }
+
+  Future<bool> loginCloud(String email, String password) async {
+    final success = await CloudStorageManager.service.login(email, password);
+    if (success) {
+      currentUserEmail.value = email;
+      await refreshSavedJsons();
+      ShowToastDialog.showToast("Logged in successfully");
+    }
+    return success;
+  }
+
+  Future<bool> signUpCloud(String email, String password) async {
+    final success = await CloudStorageManager.service.signUp(email, password);
+    if (success) {
+      currentUserEmail.value = email;
+      await refreshSavedJsons();
+      ShowToastDialog.showToast("Account created successfully");
+    }
+    return success;
+  }
+
+  Future<void> logoutCloud() async {
+    await CloudStorageManager.service.logout();
+    currentUserEmail.value = null;
+    savedJsons.clear();
+    ShowToastDialog.showToast("Logged out");
+  }
+
+  Future<bool> saveCurrentJsonToCloud(String name) async {
+    if (currentUserEmail.value == null) {
+      ShowToastDialog.showToast("Please log in first");
+      return false;
+    }
+    final content = controller.text;
+    if (content.isEmpty) {
+      ShowToastDialog.showToast("JSON is empty");
+      return false;
+    }
+
+    final success = await CloudStorageManager.service.saveJson(name, content);
+    if (success) {
+      await refreshSavedJsons();
+      ShowToastDialog.showToast("JSON saved to cloud");
+      return true;
+    } else {
+      ShowToastDialog.showToast("Save failed. Limit reached (max 5 slots)");
+      return false;
+    }
+  }
+
+  Future<void> deleteJsonFromCloud(String id) async {
+    final success = await CloudStorageManager.service.deleteJson(id);
+    if (success) {
+      await refreshSavedJsons();
+      ShowToastDialog.showToast("Document deleted");
+    } else {
+      ShowToastDialog.showToast("Delete failed");
+    }
+  }
+
+  void loadCloudJson(String content) {
+    controller.text = content;
+    Get.back();
+    ShowToastDialog.showToast("Loaded JSON from cloud");
+  }
+
+  void toggleCloudMode(String mode) async {
+    if (mode == 'Firebase' && !CloudStorageManager.firebaseInitialized) {
+      ShowToastDialog.showToast("Firebase is not configured on this device");
+      return;
+    }
+    await logoutCloud();
+    if (mode == 'Firebase') {
+      CloudStorageManager.service = FirebaseCloudStorageService();
+      cloudSyncMode.value = 'Firebase';
+    } else {
+      CloudStorageManager.service = SimulatedCloudStorageService();
+      cloudSyncMode.value = 'Local';
+    }
+    _initCloudUser();
+    ShowToastDialog.showToast("Switched sync mode to $mode");
   }
 
   _loadTheme() async {
@@ -114,9 +227,27 @@ class HomePageController extends GetxController {
 
   int lineNumber = 1;
   var columnNumber = 1.obs;
+  var isValidJson = true.obs;
+  var jsonErrorMsg = "".obs;
 
   _onTextChanged() {
     final text = controller.text;
+
+    // Validate JSON in the background
+    if (text.isEmpty) {
+      isValidJson.value = true;
+      jsonErrorMsg.value = "";
+    } else {
+      final error = JsonUtils.getJsonParsingError(text);
+      if (error == null) {
+        isValidJson.value = true;
+        jsonErrorMsg.value = "";
+      } else {
+        isValidJson.value = false;
+        jsonErrorMsg.value = error;
+      }
+    }
+
     final cursorPosition = controller.selection.baseOffset;
 
     if (cursorPosition == -1) {

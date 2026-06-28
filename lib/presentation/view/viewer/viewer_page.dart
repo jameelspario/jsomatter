@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../../utils/extensions.dart';
 import '../../controllers/home_page_controller.dart';
 import '../editor/EditorPannel.dart';
-import '../test/json_text_test.dart';
 import 'option_menu.dart';
 
 class ViewerPage extends StatelessWidget {
@@ -31,6 +30,7 @@ class ViewerPage extends StatelessWidget {
               onBold: homeController.onBold,
               onItalic: homeController.onItalic,
               onDark: homeController.onDark,
+              onProfile: homeController.onProfile,
             ),
             4.0.spaceY,
             Expanded(

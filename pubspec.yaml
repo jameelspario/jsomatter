@@ -42,6 +42,9 @@ dependencies:
   resizable_widget: ^1.0.5
   extended_text_field: ^16.0.2
   shared_preferences: ^2.5.5
+  firebase_core: ^3.1.1
+  firebase_auth: ^5.1.2
+  cloud_firestore: ^5.0.2
 
 dev_dependencies:
   flutter_test:

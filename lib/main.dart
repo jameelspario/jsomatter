@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:jsomatter/utils/cloud_storage_service.dart';
 
 import 'presentation/home_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await CloudStorageManager.init();
   runApp(const MyApp());
 }
 

@@ -53,13 +53,47 @@ class HomePage extends StatelessWidget {
             Obx(() => Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                  child: Text(
-                    "line:${controller.lineNumber} col:${controller.columnNumber.value}",
-                    style: TextStyle(
-                      color: controller.isDark.value == 1
-                          ? const Color(0xFF8B949E)
-                          : Colors.black54,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Ln ${controller.lineNumber}, Col ${controller.columnNumber.value}",
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                          color: controller.isDark.value == 1
+                              ? const Color(0xFF8B949E)
+                              : Colors.black54,
+                        ),
+                      ),
+                      if (controller.controller.text.isNotEmpty)
+                        Row(
+                          children: [
+                            Icon(
+                              controller.isValidJson.value
+                                  ? Icons.check_circle_outline_rounded
+                                  : Icons.error_outline_rounded,
+                              size: 14,
+                              color: controller.isValidJson.value
+                                  ? const Color(0xFF10B981)
+                                  : Colors.redAccent,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              controller.isValidJson.value
+                                  ? "Valid JSON"
+                                  : "Invalid JSON",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: controller.isValidJson.value
+                                    ? const Color(0xFF10B981)
+                                    : Colors.redAccent,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
                   ),
                 )),
           ],
