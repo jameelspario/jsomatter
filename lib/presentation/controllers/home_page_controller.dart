@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,13 +50,19 @@ class HomePageController extends GetxController {
     saveOldSelection();
     assignSelection(m);
     select(m);
+    _saveTabsToLocal();
   }
 
   onRemove(TabModel m) {
     tabsIndex.removeWhere((it) => it.id == m.id);
-    final mItem = tabsIndex.last;
-    assignSelection(mItem);
-    select(mItem);
+    if (tabsIndex.isEmpty) {
+      onAdd();
+    } else {
+      final mItem = tabsIndex.last;
+      assignSelection(mItem);
+      select(mItem);
+      _saveTabsToLocal();
+    }
   }
 
   onAdd() {
@@ -64,6 +71,7 @@ class HomePageController extends GetxController {
     saveOldSelection();
     resetSelection();
     select(val);
+    _saveTabsToLocal();
   }
 
   void onReorder(int oldIndex, int newIndex) {
@@ -73,6 +81,7 @@ class HomePageController extends GetxController {
     final item =
         tabsIndex.removeAt(oldIndex); // Remove the item from the old position
     tabsIndex.insert(newIndex, item);
+    _saveTabsToLocal();
   }
 
   saveOldSelection() {
@@ -111,7 +120,7 @@ class HomePageController extends GetxController {
   void onInit() {
     super.onInit();
     _loadTheme();
-    onAdd();
+    _loadTabsFromLocal();
     controller.addListener(_onTextChanged);
     _initCloudUser();
   }
@@ -225,6 +234,62 @@ class HomePageController extends GetxController {
     isDark.value = prefs.getInt('isDark') ?? 0;
   }
 
+  Future<void> _saveTabsToLocal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = tabsIndex.map((tab) => tab.toJson()).toList();
+      final jsonString = jsonEncode(list);
+      await prefs.setString('saved_tabs', jsonString);
+      
+      if (selected.id != null) {
+        await prefs.setString('selected_tab_id', selected.id.toString());
+      }
+      await prefs.setInt('tab_count', count);
+    } catch (e) {
+      print("Error saving tabs: $e");
+    }
+  }
+
+  Future<void> _loadTabsFromLocal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = prefs.getString('saved_tabs');
+      if (jsonString != null && jsonString.isNotEmpty) {
+        final List<dynamic> decoded = jsonDecode(jsonString);
+        final loadedTabs = decoded
+            .map((item) => TabModel.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
+        if (loadedTabs.isNotEmpty) {
+          tabsIndex.clear();
+          tabsIndex.addAll(loadedTabs);
+          
+          count = prefs.getInt('tab_count') ?? loadedTabs.length;
+          
+          final selectedTabIdStr = prefs.getString('selected_tab_id');
+          TabModel? selectTab;
+          if (selectedTabIdStr != null) {
+            for (var tab in tabsIndex) {
+              if (tab.id.toString() == selectedTabIdStr) {
+                selectTab = tab;
+                break;
+              }
+            }
+          }
+          selectTab ??= tabsIndex.first;
+          
+          assignSelection(selectTab);
+          select(selectTab);
+          return;
+        }
+      }
+    } catch (e) {
+      print("Error loading tabs: $e");
+    }
+    
+    // Fallback if no tabs loaded
+    onAdd();
+  }
+
   int lineNumber = 1;
   var columnNumber = 1.obs;
   var isValidJson = true.obs;
@@ -232,6 +297,8 @@ class HomePageController extends GetxController {
 
   _onTextChanged() {
     final text = controller.text;
+    selected.data = text;
+    _saveTabsToLocal();
 
     // Validate JSON in the background
     if (text.isEmpty) {
@@ -282,14 +349,20 @@ class HomePageController extends GetxController {
   onSizeChange(double size) {
     print("-------$size");
     txtSize.value = size;
+    selected.txtSize = size;
+    _saveTabsToLocal();
   }
 
   onBold() {
     isBold.value = isBold.value == 1 ? 0 : 1;
+    selected.isBold = isBold.value;
+    _saveTabsToLocal();
   }
 
   onItalic() {
     isItalic.value = isItalic.value == 1 ? 0 : 1;
+    selected.isItalic = isItalic.value;
+    _saveTabsToLocal();
   }
 
   onDark() async {
@@ -312,9 +385,13 @@ class HomePageController extends GetxController {
       print("---beautify signal----------");
       beautifySignal.add(null);
       state = 1;
+      selected.state = 1;
+      _saveTabsToLocal();
     } else if (val == "Remove white space") {
       compactJson();
       state = 2;
+      selected.state = 2;
+      _saveTabsToLocal();
     } else if (val == "Clear") {
       controller.text = "";
     } else if (val == "Load JSON data") {}
@@ -328,6 +405,9 @@ class HomePageController extends GetxController {
 
     try {
       controller.formatJson(sortJson: false);
+      state = 1;
+      selected.state = 1;
+      _saveTabsToLocal();
     } catch (e) {
       print("-- $e");
       final jsonified = Utils.jsonifyString(str);
@@ -335,6 +415,9 @@ class HomePageController extends GetxController {
 
       try {
         controller.formatJson(sortJson: false);
+        state = 1;
+        selected.state = 1;
+        _saveTabsToLocal();
       } catch (e2) {
         print("-- second format attempt failed: $e2");
         if (!JsonUtils.isValidJson(controller.text)) {
@@ -343,6 +426,9 @@ class HomePageController extends GetxController {
           if (JsonUtils.isValidJson(repaired)) {
             controller.text = repaired;
             controller.formatJson(sortJson: false);
+            state = 1;
+            selected.state = 1;
+            _saveTabsToLocal();
           } else {
             logger.logger("${JsonUtils.getJsonParsingError(controller.text)}"
                 .replaceAll("FormatException: SyntaxError:", ""));
